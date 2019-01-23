@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+/*
+ * This file is part of Composer.
+ *
+ * (c) Packagist Conductors UG (haftungsbeschränkt) <contact@packagist.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+require_once __DIR__.'/vendor/autoload.php';
+
+$app = new \Symfony\Component\Console\Application('Private Packagist');
+
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoReleaseCommand());
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionReleaseCommand());
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionRemoveCommand());
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoCustomerAddCommand());
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionGrantCommand());
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionRevokeCommand());
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoEnterpriseGrantCommand());
+$app->add(new \PrivatePackagist\Demo\Customer\MagentoEnterpriseRevokeCommand());
+
+$app->run();

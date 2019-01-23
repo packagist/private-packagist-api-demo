@@ -1,0 +1,22 @@
+{
+    "name": "private-packagist/api-demo",
+    "description": "Private Packagist API Demo",
+    "keywords": ["private packagist", "composer", "api", "demo"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Packagist Conductors UG (haftungsbeschränkt)",
+            "email": "contact@packagist.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "PrivatePackagist\\Demo\\": "src/" }
+    },
+    "require": {
+        "php": "^7.2",
+        "symfony/console": "^4.1",
+        "private-packagist/api-client": "^1.10.0",
+        "php-http/guzzle6-adapter": "^1.1.0"
+    }
+}
