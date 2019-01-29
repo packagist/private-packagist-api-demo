@@ -14,41 +14,29 @@ namespace PrivatePackagist\Demo\Command;
 
 
 use PrivatePackagist\ApiClient\Client;
-use PrivatePackagist\ApiClient\Exception\ResourceNotFoundException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MagentoReleaseCommand extends MagentoCommand
+class MagentoImportCommand extends MagentoCommand
 {
     protected function configure(): void
     {
-        $this->setName('magento-release')
-            ->setDescription('Releases a new version of Magento')
-            ->addArgument('version', InputArgument::REQUIRED);
+        $this->setName('magento-import')
+            ->setDescription('Loads packages.json file');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $client = $this->getPackagistClient();
 
-        foreach ($this->getMagentoReleaseData($input->getArgument('version')) as $packageName => $versions) {
+        foreach ($this->getMagentoBaseData() as $packageName => $versions) {
             $packageDefinition = [
                 "type" => "package",
                 "package" => array_values($versions),
             ];
-            $client->packages()->createCustomPackage(json_encode($packageDefinition));
+            $client->packages()->createCustomPackage(json_encode($packageDefinition), $this->getMagentoDownloadCredential()['id']);
             $output->writeln("Imported $packageName");
-
-            $client->packages()->editCustomPackage(
-                $packageName,
-                json_encode([
-                    "type" => "package",
-                    "package" => array_values($versions),
-                ]),
-                $this->getMagentoDownloadCredential()['id']
-            );
         }
 
         return 0;

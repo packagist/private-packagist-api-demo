@@ -10,31 +10,42 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace PrivatePackagist\Demo\Customer;
+namespace PrivatePackagist\Demo\Command;
 
 
 use PrivatePackagist\ApiClient\Client;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MagentoEnterpriseGrantCommand extends Command
+class MagentoEnterpriseGrantCommand extends MagentoCommand
 {
     protected function configure(): void
     {
         $this->setName('magento-enterprise-grant')
             ->setDescription('Grant a customer access to Mangento Enterprise packages')
-            ->addArgument();
+            ->addArgument('mage-id', InputArgument::REQUIRED);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $client = new Client(getenv('PACKAGIST_API_TOKEN'), getenv('PACKAGIST_API_SECRET'));
+        $client = $this->getPackagistClient();
 
-        $magentoEnterprisePackages = [];
+        $customer = $client->customers()->show(strtolower($input->getArgument('mage-id')));
 
-        foreach ($magentoEnterprisePackages as $packageName) {
+        $packages = [];
+        foreach ($this->getMagentoEnterprisePackageNames() as $packageName) {
+            $packages[] = [
+                'name' => $packageName,
+            ];
+        }
 
+        $packages = $client->customers()->addOrEditPackages($customer['urlName'], $packages);
+
+        $output->writeln('Granting Enterprise access to customer '.$customer['name'].' (mage id '.$customer['urlName'].'):');
+        foreach ($packages as $package) {
+            $output->writeln('  - '.$package['name']);
         }
 
         return 0;

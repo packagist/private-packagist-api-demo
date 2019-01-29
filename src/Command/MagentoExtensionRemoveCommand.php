@@ -10,7 +10,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace PrivatePackagist\Demo\Customer;
+namespace PrivatePackagist\Demo\Command;
 
 
 use PrivatePackagist\ApiClient\Client;
@@ -19,18 +19,22 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MagentoExtensionRemoveCommand extends Command
+class MagentoExtensionRemoveCommand extends MagentoCommand
 {
     protected function configure(): void
     {
         $this->setName('magento-extension-remove')
             ->setDescription('Delete an extension')
-            ->addArgument('extension-package-names', InputArgument::IS_ARRAY);
+            ->addArgument('package-names', InputArgument::IS_ARRAY);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $client = new Client(getenv('PACKAGIST_API_TOKEN'), getenv('PACKAGIST_API_SECRET'));
+        $client = $this->getPackagistClient();
+
+        foreach ($input->getArgument('package-names') as $packageName) {
+            $client->packages()->remove($packageName);
+        }
 
         return 0;
     }

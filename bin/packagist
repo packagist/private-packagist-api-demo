@@ -11,17 +11,22 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-require_once __DIR__.'/vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
+
+\Symfony\Component\Debug\Debug::enable();
 
 $app = new \Symfony\Component\Console\Application('Private Packagist');
 
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoReleaseCommand());
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionReleaseCommand());
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionRemoveCommand());
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoCustomerAddCommand());
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionGrantCommand());
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoExtensionRevokeCommand());
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoEnterpriseGrantCommand());
-$app->add(new \PrivatePackagist\Demo\Customer\MagentoEnterpriseRevokeCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoGenerateDataCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoImportCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoReleaseCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoExtensionReleaseCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoExtensionRemoveCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoCustomerAddCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoExtensionGrantCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoExtensionRevokeCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoEnterpriseGrantCommand());
+$app->add(new \PrivatePackagist\Demo\Command\MagentoEnterpriseRevokeCommand());
+$app->add(new \PrivatePackagist\Demo\Command\DeleteAllCommand());
 
 $app->run();

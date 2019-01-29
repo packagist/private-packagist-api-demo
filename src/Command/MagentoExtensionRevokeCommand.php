@@ -10,7 +10,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace PrivatePackagist\Demo\Customer;
+namespace PrivatePackagist\Demo\Command;
 
 
 use PrivatePackagist\ApiClient\Client;
@@ -19,26 +19,26 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MagentoExtensionRevokeCommand extends Command
+class MagentoExtensionRevokeCommand extends MagentoCommand
 {
     protected function configure(): void
     {
         $this->setName('magento-extension-revoke')
             ->setDescription('Revoke customer access to an extension')
             ->addArgument('mage-id', InputArgument::REQUIRED)
-            ->addArgument('extension-package-names', InputArgument::IS_ARRAY);
+            ->addArgument('package-names', InputArgument::IS_ARRAY);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $client = new Client(getenv('PACKAGIST_API_TOKEN'), getenv('PACKAGIST_API_SECRET'));
+        $client = $this->getPackagistClient();
 
-        $customer = $client->customers()->findByName($input->getArgument('mage-id'));
+        $customer = $client->customers()->show(strtolower($input->getArgument('mage-id')));
 
-        $output->writeln('Revoking customer '.$customer->name.' (id '.$customer->id.') access to packages:');
+        $output->writeln('Revoking customer '.$customer['name'].' (mage id '.$customer['urlName'].') access to packages:');
 
-        foreach ($input->getArgument('extension-package-names') as $packageName) {
-            $client->customers()->removePackage($customer->id, $packageName);
+        foreach ($input->getArgument('package-names') as $packageName) {
+            $client->customers()->removePackage($customer['urlName'], $packageName);
             $output->writeln('  - '.$packageName);
         }
 

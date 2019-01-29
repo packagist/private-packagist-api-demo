@@ -10,7 +10,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace PrivatePackagist\Demo\Customer;
+namespace PrivatePackagist\Demo\Command;
 
 
 use PrivatePackagist\ApiClient\Client;
@@ -19,24 +19,24 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MagentoExtensionGrantCommand extends Command
+class MagentoExtensionGrantCommand extends MagentoCommand
 {
     protected function configure(): void
     {
         $this->setName('magento-extension-grant')
             ->setDescription('Make an extension available to a customer')
             ->addArgument('mage-id', InputArgument::REQUIRED)
-            ->addArgument('extension-package-names', InputArgument::IS_ARRAY);
+            ->addArgument('extension-names', InputArgument::IS_ARRAY);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $client = new Client(getenv('PACKAGIST_API_TOKEN'), getenv('PACKAGIST_API_SECRET'));
+        $client = $this->getPackagistClient();
 
-        $customer = $client->customers()->findByName($input->getArgument('mage-id'));
+        $customer = $client->customers()->show(strtolower($input->getArgument('mage-id')));
 
         $packages = [];
-        foreach ($input->getArgument('extension-package-names') as $packageName) {
+        foreach ($input->getArgument('extension-names') as $packageName) {
             $packages[] = [
                 'name' => $packageName,
                 //'versionConstraint' => '^1.0 | ^2.0', // optional version constraint to limit updades the customer receives
@@ -44,11 +44,11 @@ class MagentoExtensionGrantCommand extends Command
             ];
         }
 
-        $packages = $client->customers()->addOrUpdatePackages($customer->id, $packages);
+        $packages = $client->customers()->addOrEditPackages($customer['urlName'], $packages);
 
-        $output->writeln('Customer '.$customer->name.' (id '.$customer->id.') now has access to these packages:');
+        $output->writeln('Customer '.$customer['name'].' (mage id '.$customer['urlName'].') now has access to these extensions:');
         foreach ($packages as $package) {
-            $output->writeln('  - '.$package->name);
+            $output->writeln('  - '.$package['name']);
         }
 
         return 0;

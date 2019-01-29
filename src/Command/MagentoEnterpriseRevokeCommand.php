@@ -10,31 +10,40 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace PrivatePackagist\Demo\Customer;
+namespace PrivatePackagist\Demo\Command;
 
 
 use PrivatePackagist\ApiClient\Client;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MagentoEnterpriseRevokeCommand extends Command
+class MagentoEnterpriseRevokeCommand extends MagentoCommand
 {
     protected function configure(): void
     {
         $this->setName('magento-enterprise-revoke')
             ->setDescription('Revokes Magento Enterprise access from a customer')
-            ->addArgument();
+            ->addArgument('mage-id', InputArgument::REQUIRED);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $client = new Client(getenv('PACKAGIST_API_TOKEN'), getenv('PACKAGIST_API_SECRET'));
+        $client = $this->getPackagistClient();
 
-        $magentoEnterprisePackages = [];
+        $customer = $client->customers()->show(strtolower($input->getArgument('mage-id')));
 
-        foreach ($magentoEnterprisePackages as $packageName) {
+        $output->writeln('Revoking Enterprise access for customer '.$customer['name'].' (mage id '.$customer['urlName'].'):');
 
+        $packages = [];
+        foreach ($this->getMagentoEnterprisePackageNames() as $packageName) {
+            try {
+                $client->customers()->removePackage($customer['urlName'], $packageName);
+            } catch (ResourceNotFoundException $e) {
+                // ignore, package did not exist
+            }
+            $output->writeln('  - '.$packageName);
         }
 
         return 0;
