@@ -39,7 +39,7 @@ class MagentoExtensionGrantCommand extends MagentoCommand
         foreach ($input->getArgument('extension-names') as $packageName) {
             $packages[] = [
                 'name' => $packageName,
-                //'versionConstraint' => '^1.0 | ^2.0', // optional version constraint to limit updades the customer receives
+                //'versionConstraint' => '^1.0 | ^2.0', // optional version constraint to limit updates the customer receives
                 //'expirationDate' => (new \DateTime())->add(new \DateInterval('P1Y'))->format('c'), // optional expiration date to limit updates the customer receives
             ];
         }

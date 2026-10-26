@@ -24,7 +24,7 @@ class MagentoEnterpriseGrantCommand extends MagentoCommand
     protected function configure(): void
     {
         $this->setName('magento-enterprise-grant')
-            ->setDescription('Grant a customer access to Mangento Enterprise packages')
+            ->setDescription('Grant a customer access to Magento Enterprise packages')
             ->addArgument('mage-id', InputArgument::REQUIRED);
     }
 
